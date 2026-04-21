@@ -1,48 +1,19 @@
 const express = require("express");
-const fs = require("fs");
-const path = require("path");
-
 const router = express.Router();
 
-// 🔹 caminho do arquivo
-const filePath = path.join(__dirname, "../data/cards.json");
+const Card = require("../models/cards");
 
-// 🔹 GET /cards
-router.get("/", (req, res) => {
-  fs.readFile(filePath, "utf8", (err, data) => {
-    if (err) {
-      return res.status(500).send({
-        message: "Erro ao ler os cards",
-      });
-    }
+const {
+  getCards,
+  createCard,
+  deleteCard,
+  likeCard,
+  dislikeCard,
+} = require("../controllers/cards");
 
-    const cards = JSON.parse(data);
-    res.send(cards);
-  });
-});
-
-// 🔹 GET /cards/:id
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
-
-  fs.readFile(filePath, "utf8", (err, data) => {
-    if (err) {
-      return res.status(500).send({
-        message: "Erro ao ler os cards",
-      });
-    }
-
-    const cards = JSON.parse(data);
-    const card = cards.find((c) => c._id === id);
-
-    if (!card) {
-      return res.status(404).send({
-        message: "ID do card não encontrado",
-      });
-    }
-
-    res.send(card);
-  });
-});
-
+router.get("/", getCards);
+router.post("/", createCard);
+router.delete("/:cardId", deleteCard);
+router.put("/:cardId/likes", likeCard);
+router.delete("/:cardId/likes", dislikeCard);
 module.exports = router;
